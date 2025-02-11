@@ -4,11 +4,11 @@
    * [Типобезопасность](#-type_safety)
    * [Преобразование типов](#-type_conversion)
    * [Арифметические операции](#-arithmetic_operations)
-   * [Условные конструкции](#-conditional_constructions)
-   * [Тернарный оператор](#-ternary_operator)
-   * [Конструкция switch/case](#-switch)
-   * [Кортежи](#-tuples)
    * [nil и опциональные типы](#-nil)
+   * [Условные конструкции](#-conditional_constructions)
+   * [Кортежи](#-tuples)
+   * [Циклы](#-cycles)
+   * [Функции и методы](#-functions)
 
 
 <!-- TOC --><a name=""></a>
@@ -67,10 +67,20 @@ let tempX = Double(x) // 5.0
 
 ---
 
+<!-- TOC --><a name="-nil"></a>
+
+### nil и опциональные типы
+```
+var number: Int? = 12
+number = nil
+```
+
+---
+
 <!-- TOC --><a name="-conditional_constructions"></a>
 
 ### Условные конструкции
-`if/else if/ else` 
+#### if/else if/ else
 ```
 et num1 = 22
 let num2 = 15
@@ -89,11 +99,7 @@ else{
 }
 ```
 
----
-
-<!-- TOC --><a name="-ternary_operator"></a>
-
-### Тернарный оператор
+#### Тернарный оператор
 ```
 var num1 = 10
 var num2 = 6
@@ -101,11 +107,7 @@ var num2 = 6
 var num3 = num1 > num2 ? num1 - num2 : num1 + num2
 ```
 
----
-
-<!-- TOC --><a name="-switch"></a>
-
-Конструкция `switch/case`
+#### Конструкция `switch/case`
 ```
 var num: Int = 22
  
@@ -216,6 +218,42 @@ default:break
 }
 ```
 
+#### if let
+Конструкция `if let` позволяет безопасно извлечь значение из опционала и использовать его внутри блока `if`. Если опционал содержит значение, то оно извлекается и может быть использовано внутри блока. Если опционал равен `nil`, то блок `if` не выполняется.
+```
+let optionalName: String? = "John"
+
+if let name = optionalName {
+    print("Hello, \(name)!")
+} else {
+    print("Hello, anonymous!")
+}
+```
+
+#### guard let
+Конструкция ```guard let``` также используется для безопасного извлечения значения из опционала, но она работает немного иначе. ```guard let``` используется для раннего выхода из функции, метода или замыкания, если опционал равен ```nil```. Если значение извлечено успешно, оно может быть использовано за пределами блока ```guard```.
+```
+func greet(name: String?) {
+    guard let name = name else {
+        print("Hello, anonymous!")
+        return
+    }
+    
+    print("Hello, \(name)!")
+}
+
+greet(name: "John")  // Выведет: Hello, John!
+greet(name: nil)     // Выведет: Hello, anonymous!
+```
+
+Область видимости:
+- `if let` ограничивает область видимости извлеченного значения блоком `if`.
+- `guard let` делает извлеченное значение доступным за пределами блока `guard`.
+
+Использование:
+- `if let` используется, когда вам нужно выполнить код только если опционал содержит значение.
+- `guard let` используется для раннего выхода из функции или метода, если опционал равен `nil`.
+
 ---
 
 <!-- TOC --><a name="-tuples"></a>
@@ -243,12 +281,106 @@ let(_, age, name) = userInfo
 
 ---
 
-<!-- TOC --><a name="-nil"></a>
+<!-- TOC --><a name="-cycles"></a>
 
-### nil и опциональные типы
+### Циклы
+
+#### Цикл for-in
 ```
-var number: Int? = 12
-number = nil
+for item in 1...5 {
+     
+    print(item)
+}
+```
+
+#### Цикл while
+```
+while условие {
+     
+    // действия
+}
+```
+
+#### Цикл repeat-while
+```
+repeat {
+     
+    print(i)
+    i-=1
+} while i > 0
 ```
 
 ---
+
+<!-- TOC --><a name="-functions"></a>
+
+### Функции и методы
+```
+func имя_функции (параметры) -> тип_возвращаемого_значения {
+     
+    // набор инструкций
+}
+```
+
+#### Параметры функции
+```
+func printInfo(name: String, age: Int){
+ 
+    print("Имя: \(name) ; возраст: \(age)")
+}
+```
+
+#### Значения параметров по умолчанию
+```
+func printInfo(name: String = "Tom", age: Int = 22){
+ 
+    print("Имя: \(name) ; возраст: \(age)")
+}
+```
+
+#### Дополнительно о параметрах функций
+С помощью оператора многоточия (`...`) можно устанавливать произвольное количество параметров одного типа.
+```
+func sum(numbers: Int...) -> Int{
+ 
+    var total: Int = 0
+    for number in numbers{
+     
+        total+=number
+    }
+    return total
+}
+ 
+sum(1, 2, 3, 4, 5)  // 15
+```
+
+#### Выходные параметры inout
+Если  необходимо изменить значение параметра, то его надо определить с ключевым словом `inout`:
+```
+func increase(_ n : inout Int){
+    n += 10
+}
+ 
+var d = 20
+increase(&d)
+print(d)        // 30
+```
+
+#### Перегрузка функций
+Нам доступен механизм перегрузки функций, то есть мы можем определять функции с одним и тем же именем, но разным количеством или типом параметров:
+```
+func sum(_ x: Int, _ y : Int){
+    print(x+y)
+}
+func sum(_ x: Double, _ y: Double){
+    print(x+y)
+}
+ 
+func sum(_ x: Int, _ y: Int, _ z: Int ){
+    print(x + y + z)
+}
+ 
+sum(1, 2)           // 3
+sum(1.2, 2.3)       // 3.5
+sum(2, 3, 4)        // 9
+```
